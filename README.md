@@ -27,46 +27,6 @@ Flakies POS is a scalable, modular Point of Sale system designed for the Kenyan 
 
 ## Project Structure
 
-```
-flakies-pos-frontend/
-├── public/              # Static assets
-├── src/
-│   ├── assets/          # Images, fonts, etc.
-│   ├── components/      # Reusable Vue components
-│   │   ├── common/      # Shared components (buttons, modals, etc.)
-│   │   ├── dashboard/   # Dashboard-specific components
-│   │   ├── inventory/   # Inventory-specific components
-│   │   ├── pos/         # POS terminal components
-│   │   └── settings/    # Settings-related components
-│   ├── layouts/         # Page layouts
-│   ├── modules/         # Industry-specific modules
-│   │   ├── restaurant/  # Restaurant-specific components
-│   │   ├── retail/      # Retail-specific components
-│   │   └── hotel/       # Hotel-specific components
-│   ├── plugins/         # Vue plugins configuration
-│   ├── router/          # Vue Router configuration
-│   ├── services/        # API services
-│   │   ├── auth.js      # Authentication service
-│   │   ├── sales.js     # Sales API service
-│   │   ├── inventory.js # Inventory API service
-│   │   └── ai.js        # AI predictions service
-│   ├── store/           # Vuex store modules
-│   │   ├── index.js     # Store entry point
-│   │   ├── modules/     # Store modules
-│   │   └── plugins/     # Store plugins
-│   ├── utils/           # Utility functions
-│   ├── views/           # Page components
-│   ├── App.vue          # Root component
-│   └── main.js          # Application entry point
-├── .env                 # Environment variables
-├── .eslintrc.js         # ESLint configuration
-├── .gitignore           # Git ignore file
-├── babel.config.js      # Babel configuration
-├── jest.config.js       # Jest configuration
-├── package.json         # Dependencies and scripts
-├── README.md            # This file
-└── vue.config.js        # Vue CLI configuration
-```
 
 ## Setup Instructions
 

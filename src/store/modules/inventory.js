@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import inventoryService from '@/services/inventory.service';
 
 const state = {
@@ -109,4 +110,136 @@ const actions = {
       
       commit('SET_LOADING', false);
     } catch (error) {
-      commit('SET_ERROR', error.response?.data?.message || 'Faile
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to fetch products');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  async fetchCategories({ commit, rootState }) {
+    commit('SET_LOADING', true);
+    
+    try {
+      if (rootState.offlineMode) {
+        // Load from local storage if offline
+        const storedCategories = localStorage.getItem('flakies-categories');
+        if (storedCategories) {
+          commit('SET_CATEGORIES', JSON.parse(storedCategories));
+          commit('SET_LOADING', false);
+          return;
+        }
+      }
+      
+      const response = await inventoryService.getCategories();
+      const categories = response.data;
+      
+      // Store for offline access
+      localStorage.setItem('flakies-categories', JSON.stringify(categories));
+      
+      commit('SET_CATEGORIES', categories);
+      commit('SET_LOADING', false);
+    } catch (error) {
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to fetch categories');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  async addProduct({ commit }, product) {
+    commit('SET_LOADING', true);
+    
+    try {
+      const response = await inventoryService.addProduct(product);
+      const newProduct = response.data;
+      
+      commit('ADD_PRODUCT', newProduct);
+      commit('SET_PRODUCT_STOCK', { 
+        productId: newProduct.id, 
+        stock: newProduct.stock 
+      });
+      
+      commit('SET_LOADING', false);
+      return newProduct;
+    } catch (error) {
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to add product');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  async updateProduct({ commit }, product) {
+    commit('SET_LOADING', true);
+    
+    try {
+      const response = await inventoryService.updateProduct(product);
+      const updatedProduct = response.data;
+      
+      commit('UPDATE_PRODUCT', updatedProduct);
+      commit('SET_PRODUCT_STOCK', { 
+        productId: updatedProduct.id, 
+        stock: updatedProduct.stock 
+      });
+      
+      commit('SET_LOADING', false);
+      return updatedProduct;
+    } catch (error) {
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to update product');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  async deleteProduct({ commit }, productId) {
+    commit('SET_LOADING', true);
+    
+    try {
+      await inventoryService.deleteProduct(productId);
+      
+      commit('DELETE_PRODUCT', productId);
+      commit('SET_LOADING', false);
+    } catch (error) {
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to delete product');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  async updateStock({ commit }, { productId, quantity, type }) {
+    commit('SET_LOADING', true);
+    
+    try {
+      const response = await inventoryService.updateStock(productId, quantity, type);
+      const newStock = response.data.stock;
+      
+      commit('SET_PRODUCT_STOCK', { productId, stock: newStock });
+      
+      // Also update the product in the products array
+      const product = state.products.find(p => p.id === productId);
+      if (product) {
+        const updatedProduct = { ...product, stock: newStock };
+        commit('UPDATE_PRODUCT', updatedProduct);
+      }
+      
+      commit('SET_LOADING', false);
+      return newStock;
+    } catch (error) {
+      commit('SET_ERROR', error.response?.data?.message || 'Failed to update stock');
+      commit('SET_LOADING', false);
+      throw error;
+    }
+  },
+  
+  setLowStockThreshold({ commit }, threshold) {
+    commit('SET_LOW_STOCK_THRESHOLD', threshold);
+    // Save to settings or user preferences
+    localStorage.setItem('flakies-low-stock-threshold', threshold);
+  }
+};
+
+export default {
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
+};
